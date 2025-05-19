@@ -1,10 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
+$1
+<head>
 $1
   <audio id="bg-music" autoplay loop>
     <source src="https://cdn.pixabay.com/download/audio/2022/03/24/audio_48aeb81bb2.mp3?filename=casual-silly-loop-34408.mp3" type="audio/mpeg">
     Your browser does not support the audio element.
-  </audio>
+  $1
+  <div style="margin-top: 10px;">
+    <label for="volumeControl">🎵 Volume:</label>
+    <input type="range" id="volumeControl" min="0" max="1" step="0.01" value="0.5" onchange="setVolume(this.value)">
+  </div>
 <meta charset="UTF-8">
   <title>Karen's HOA Empire</title>
   <style>
@@ -54,7 +58,10 @@ $1
     box-shadow: 0 0 10px 2px #ff4500, 0 0 20px 6px #ff6347;
     transition: box-shadow 0.3s ease-in-out;
   }
-</style>
+$1
+  <audio id="gasp-sfx">
+    <source src="https://cdn.pixabay.com/download/audio/2022/03/25/audio_a9c67fe58c.mp3?filename=gasp-33668.mp3" type="audio/mpeg">
+  </audio>
 <style>
   #popup {
     position: fixed;
@@ -73,6 +80,25 @@ $1
 </style>
 </head>
 <body>
+  <div id="loadingScreen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: gold; color: blue; display: flex; align-items: center; justify-content: center; font-size: 2em; z-index: 9999; animation: spinText 5s linear forwards;">
+    <div id="loadingText">Made by Jon Bong</div>
+  </div>
+  <style>
+    @keyframes spinText {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    #loadingText {
+      animation: spinText 5s linear infinite;
+    }
+  </style>
+  <script>
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.getElementById('loadingScreen').style.display = 'none';
+      }, 5000);
+    });
+  </script>
   <h1>Karen's HOA Empire$1
   <div class="panel" style="display: flex; flex-direction: column; align-items: center;">
   <h3>🏁 HOA Progress</h3>
@@ -187,7 +213,33 @@ $1
         }
       }, 15000);
       renderCuldesac();
-    </script>
+    function checkAutoUnlocks() {
+  const unlocks = [
+    { threshold: 10, element: 'buyTrashCanViolation', label: '🗑️ Trash Can Patrol (10 VP)' },
+    { threshold: 50, element: 'buyBirdFeederViolation', label: '🐦 Illegal Bird Feeder (25 VP)' },
+    { threshold: 200, element: 'buyGrassHeightViolation', label: '🌾 Improper Grass Height (200 VP)' },
+    { threshold: 500, element: 'buyHolidayLightsViolation', label: '🎄 Holiday Lights Off-Season (500 VP)' },
+    { threshold: 1000, element: 'buyDogPatrolUpgrade', label: '🐕 Dog Poop Patrol (1000 VP)' },
+    { threshold: 2500, element: 'buyWalkingClubUpgrade', label: '🚶 Walking Club (2500 VP)' },
+    { threshold: 5000, element: 'buyNeighborhoodWatchUpgrade', label: '👀 Neighborhood Watch (5000 VP)' },
+    { threshold: 10000, element: 'buyNeighborhoodWatchSpeedUpgrade', label: '⏱️ Upgrade Watch Speed (10,000 VP)' }
+  ];
+
+  unlocks.forEach(upg => {
+    $1
+      btn.title = `Unlocks at ${upg.threshold} VP`;
+      if (vp >= upg.threshold && btn.style.opacity === '0.4') {
+        btn.style.transition = 'box-shadow 0.5s ease';
+        btn.style.boxShadow = '0 0 12px 4px #2ecc71';
+        setTimeout(() => { btn.style.boxShadow = 'none'; }, 1000);
+      }
+      btn.disabled = vp < upg.threshold;
+      btn.style.opacity = vp >= upg.threshold ? 1 : 0.4;
+    }
+  });
+}
+
+</script>
     <div style="width: 80px; height: 80px; background: #ddd; border: 2px solid #999; border-radius: 10px; padding: 5px;">Karen</div>
     <div style="width: 80px; height: 80px; background: #eee; border: 2px solid #bbb; border-radius: 10px; padding: 5px;">Linda</div>
     <div style="width: 80px; height: 80px; background: #ddd; border: 2px solid #999; border-radius: 10px; padding: 5px;">Doug</div>
@@ -251,12 +303,12 @@ let neighborhoodWatchUpgrades = 0;
 let neighborhoodWatchSpeed = 1;
         
     function issueViolation() {
-      vp++;
+      vp += 2;
       updateDisplay();
     }
 
     function buyTrashCanViolation() {
-      if (vp >= 10) {
+      if (vp >= 5) {
         vp -= 10;
         trashUpgrades++;
         updateDisplay();
@@ -276,6 +328,7 @@ let neighborhoodWatchSpeed = 1;
 }
 
     function updateDisplay() {
+  checkAutoUnlocks();
   const progress = Math.min((vp / 100000) * 100, 100);
   document.getElementById('progressBar').style.width = progress + '%';
   document.getElementById('progressPercent').textContent = Math.floor(progress) + '%';
@@ -295,10 +348,11 @@ let neighborhoodWatchSpeed = 1;
     }
 
     setInterval(() => {
-      vp += calculateVPS();
+      vp += Math.max(calculateVPS(), 0.2);
       updateDisplay();
     }, 1000);
   function updateGossip() {
+  const gasp = document.getElementById("gasp-sfx");
   const gossipMessages = [
     "Karen saw a trampoline 2 inches too tall... citation incoming.",
     "Linda tried to host a bake sale. No permit.",
@@ -311,10 +365,14 @@ let neighborhoodWatchSpeed = 1;
     "Steve forgot to edge his lawn—again."
   ];
   const gossipLog = document.getElementById("gossipLog");
-  if (Math.random() < 0.2) {
+  if (Math.random() < 0.4) {
     const msg = gossipMessages[Math.floor(Math.random() * gossipMessages.length)];
     const p = document.createElement("p");
     p.textContent = msg;
+    if (gasp) {
+      gasp.currentTime = 0;
+      gasp.play();
+    }
     gossipLog.appendChild(p);
     if (gossipLog.children.length > 5) {
       gossipLog.removeChild(gossipLog.children[0]);
@@ -413,33 +471,20 @@ function triggerGossipEvent(tier) {
     gossipPoints -= costs[tier];
     showPopup(messages[tier]);
     if (tier === 1) { vp += 100; }
-if (tier === 2) { vp += 500; }
-if (tier === 3) { vp += 1500; }
-    if (tier === 2) {
-      vp += 500;
-      const slot = armorSlots[Math.floor(Math.random() * 8)];
-      const roll = Math.random();
-      if (roll < 0.1) armorTiers[slot] = Math.max(armorTiers[slot], 3);
-      else if (roll < 0.4) armorTiers[slot] = Math.max(armorTiers[slot], 2);
-      else armorTiers[slot] = Math.max(armorTiers[slot], 1);
-      armor[slot]++;
+
     }
-    if (tier === 3) {
-      vp += 1500;
-      const slot = armorSlots[Math.floor(Math.random() * 8)];
-      const roll = Math.random();
-      if (roll < 0.1) armorTiers[slot] = Math.max(armorTiers[slot], 3);
-      else if (roll < 0.4) armorTiers[slot] = Math.max(armorTiers[slot], 2);
-      else armorTiers[slot] = Math.max(armorTiers[slot], 1);
-      armor[slot]++;
+    
     }
-    updateDisplay();
     updateDisplay();
   } else {
     showPopup("Not enough Gossip Points!");
   }
 }
-</script>
+function setVolume(val) {
+  const bgMusic = document.getElementById('bg-music');
+  if (bgMusic) bgMusic.volume = val;
+}
+$1
 <div id="popup"></div>
 
 <script>
