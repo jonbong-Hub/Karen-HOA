@@ -59,23 +59,111 @@
 <body>
   <h1>Karen's HOA Empire</h1>
 
-  <div class="panel">
-    <p>Violation Points: <span id="vp">0</span></p>
-    <button onclick="issueViolation()">📋 Issue Violation</button>
-  </div>
+  $1
+    <p>Armor Points: <span id="armor">0</span></p>
+    <button onclick="buyArmor()">🛡️ Buy HOA Legal Armor (750 VP)</button>
 
   <div class="panel">
-    <h3>Upgrades</h3>
+    <h3>Violations</h3>
     <button onclick="buyTrashCanViolation()">🗑️ Trash Can Patrol (10 VP)</button><br>
-    <button onclick="buyDogPoopPatrol()">🐾 Dog Poop Patrol (100 VP)</button><br>
-    <button onclick="buyWalkingClub()">🚶 Walking Club (1000 VP)</button>
+    <button onclick="buyBirdFeederViolation()">🐦 Illegal Bird Feeder (25 VP)</button><br>
+    <button onclick="buyGrassHeightViolation()">🌾 Improper Grass Height (200 VP)</button><br>
+    <button onclick="buyHolidayLightsViolation()">🎄 Holiday Lights Off-Season (500 VP)</button><br>
   </div>
 
-  <div class="panel" id="stats">
+  <div class="panel">
+    <h3>Neighborhood Upgrades</h3>
+    <button onclick="buyDogPatrolUpgrade()">🐕 Dog Poop Patrol (1000 VP)</button><br>
+    <button onclick="buyWalkingClubUpgrade()">🚶 Walking Club (2500 VP)</button><br>
+    <button onclick="buyNeighborhoodWatchUpgrade()">👀 Neighborhood Watch (5000 VP)</button><br>
+  </div>
+    <button onclick="buyTrashCanViolation()">🗑️ Trash Can Patrol (10 VP)</button><br>
+    
+    
+  <div class="panel">
+  <h3>🏘️ Cul-de-Sac View</h3>
+  <div id="culdesac" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+    <script>
+      const houses = ["Karen", "Linda", "Doug", "Barb", "Tina", "Steve", "Janelle", "Jeff", "Ron", "Melinda"];
+      const houseStatus = {};
+      let influence = {};
+
+      houses.forEach(name => {
+        houseStatus[name] = { violations: 0, gossipTarget: false };
+        influence[name] = 0;
+      });
+
+      function renderCuldesac() {
+        const container = document.getElementById("culdesac");
+        container.innerHTML = "";
+        houses.forEach(name => {
+          const div = document.createElement("div");
+          div.className = "house-tile";
+          div.textContent = name + (houseStatus[name].gossipTarget ? " 🔥" : "");
+          div.style.width = "80px";
+          div.style.height = "80px";
+          div.style.background = houseStatus[name].gossipTarget ? "#ffc0cb" : "#ddd";
+          div.style.border = "2px solid #999";
+          div.style.borderRadius = "10px";
+          div.style.padding = "5px";
+          div.style.cursor = "pointer";
+          div.onclick = () => {
+            houseStatus[name].violations++;
+            influence[name]++;
+            showPopup(`${name} checked. Violations: ${houseStatus[name].violations}, Influence: ${influence[name]}`);
+            updateDisplay();
+            renderCuldesac();
+          };
+          container.appendChild(div);
+        });
+      }
+
+      function highlightGossipTargets() {
+        const target = houses[Math.floor(Math.random() * houses.length)];
+        houseStatus[target].gossipTarget = true;
+        setTimeout(() => {
+          houseStatus[target].gossipTarget = false;
+          renderCuldesac();
+        }, 7000);
+        renderCuldesac();
+      }
+
+      setInterval(highlightGossipTargets, 15000);
+      renderCuldesac();
+    </script>
+    <div style="width: 80px; height: 80px; background: #ddd; border: 2px solid #999; border-radius: 10px; padding: 5px;">Karen</div>
+    <div style="width: 80px; height: 80px; background: #eee; border: 2px solid #bbb; border-radius: 10px; padding: 5px;">Linda</div>
+    <div style="width: 80px; height: 80px; background: #ddd; border: 2px solid #999; border-radius: 10px; padding: 5px;">Doug</div>
+    <div style="width: 80px; height: 80px; background: #eee; border: 2px solid #bbb; border-radius: 10px; padding: 5px;">Barb</div>
+    <div style="width: 80px; height: 80px; background: #ddd; border: 2px solid #999; border-radius: 10px; padding: 5px;">Tina</div>
+    <div style="width: 80px; height: 80px; background: #eee; border: 2px solid #bbb; border-radius: 10px; padding: 5px;">Steve</div>
+    <div style="width: 80px; height: 80px; background: #ddd; border: 2px solid #999; border-radius: 10px; padding: 5px;">Janelle</div>
+    <div style="width: 80px; height: 80px; background: #eee; border: 2px solid #bbb; border-radius: 10px; padding: 5px;">Jeff</div>
+    <div style="width: 80px; height: 80px; background: #ddd; border: 2px solid #999; border-radius: 10px; padding: 5px;">Ron</div>
+    <div style="width: 80px; height: 80px; background: #eee; border: 2px solid #bbb; border-radius: 10px; padding: 5px;">Melinda</div>
+  </div>
+</div>
+
+<div class="panel">
+  <h3>🔥 Gossip Events</h3>
+    <p>Spend Gossip Points to trigger HOA-wide chaos.</p>
+    <button onclick="triggerGossipEvent(1)">Start Small Rumor (5 GP)</button><br>
+    <button onclick="triggerGossipEvent(2)">Fuel Neighborhood Suspicion (15 GP)</button><br>
+    <button onclick="triggerGossipEvent(3)">Launch Full HOA Inquiry (40 GP)</button>
+  </div>
+
+$1
+    <p>Gossip Points: <span id="gossipPoints">0</span></p>
+<p>Influence Points: <span id="influencePoints">0</span></p>
+    <button onclick="convertToGossip()">Transfer 100 VP ➡️ 1 Gossip Point</button>
     <p>Trash Can Units: <span id="trashUpgrades">0</span></p>
-    <p>Dog Patrols: <span id="dogUpgrades">0</span></p>
-    <p>Walking Club Members: <span id="walkUpgrades">0</span></p>
-    <p>VP/sec: <span id="vps">0</span></p>
+<p>Bird Feeder Citations: <span id="birdFeederUpgrades">0</span></p>
+<p>Grass Violations: <span id="grassHeightUpgrades">0</span></p>
+<p>Holiday Light Offenses: <span id="holidayLightsUpgrades">0</span></p>
+<p>Dog Patrol Units: <span id="dogPatrolUpgrades">0</span></p>
+<p>Walking Club Agents: <span id="walkingClubUpgrades">0</span></p>
+<p>Neighborhood Watch Teams: <span id="neighborhoodWatchUpgrades">0</span></p>
+            <p>VP/sec: <span id="vps">0</span></p>
   </div>
 
   <div class="panel">
@@ -94,10 +182,37 @@
 
   <script>
     let vp = 0;
-    let trashUpgrades = 0;
-    let dogUpgrades = 0;
-    let walkUpgrades = 0;
+let armor = {
+  helmet: 0,
+  chest: 0,
+  legs: 0,
+  arms: 0,
+  feet: 0,
+  gloves: 0,
+  earrings: 0,
+  watch: 0
+};
 
+let armorTiers = {
+  helmet: 0,
+  chest: 0,
+  legs: 0,
+  arms: 0,
+  feet: 0,
+  gloves: 0,
+  earrings: 0,
+  watch: 0
+};
+let gossipPoints = 0;
+let influencePoints = 0;
+    let trashUpgrades = 0;
+let birdFeederUpgrades = 0;
+let grassHeightUpgrades = 0;
+let holidayLightsUpgrades = 0;
+let dogPatrolUpgrades = 0;
+let walkingClubUpgrades = 0;
+let neighborhoodWatchUpgrades = 0;
+        
     function issueViolation() {
       vp++;
       updateDisplay();
@@ -111,34 +226,34 @@
       }
     }
 
-    function buyDogPoopPatrol() {
-      if (vp >= 100) {
-        vp -= 100;
-        dogUpgrades++;
-        updateDisplay();
-      }
-    }
+            function calculateVPS() {
+  let base = 
+    trashUpgrades * 0.1 +
+    birdFeederUpgrades * 0.3 +
+    grassHeightUpgrades * 1.5 +
+    holidayLightsUpgrades * 3;
 
-    function buyWalkingClub() {
-      if (vp >= 1000) {
-        vp -= 1000;
-        walkUpgrades++;
-        updateDisplay();
-      }
-    }
+  let boost = 1 + (dogPatrolUpgrades * 0.01 + walkingClubUpgrades * 0.02 + neighborhoodWatchUpgrades * 0.05);
 
-    function calculateVPS() {
-      return trashUpgrades * 0.1 + dogUpgrades * 1 + walkUpgrades * 5;
-    }
+  return base * boost;
+}
 
     function updateDisplay() {
-      updateGossip();
-      updateLeaderboard();
-      document.getElementById('vp').textContent = Math.floor(vp);
-      document.getElementById('trashUpgrades').textContent = trashUpgrades;
-      document.getElementById('dogUpgrades').textContent = dogUpgrades;
-      document.getElementById('walkUpgrades').textContent = walkUpgrades;
-      document.getElementById('vps').textContent = calculateVPS().toFixed(1);
+  updateArmorDisplay();
+  document.getElementById('armor').textContent = Object.values(armor).reduce((a, b) => a + b, 0);
+  document.getElementById('gossipPoints').textContent = gossipPoints;
+  document.getElementById('influencePoints').textContent = influencePoints;
+  updateGossip();
+  updateLeaderboard();
+  document.getElementById('vp').textContent = Math.floor(vp);
+  document.getElementById('trashUpgrades').textContent = trashUpgrades;
+  document.getElementById('birdFeederUpgrades').textContent = birdFeederUpgrades;
+  document.getElementById('grassHeightUpgrades').textContent = grassHeightUpgrades;
+  document.getElementById('holidayLightsUpgrades').textContent = holidayLightsUpgrades;
+  document.getElementById('dogPatrolUpgrades').textContent = dogPatrolUpgrades;
+  document.getElementById('walkingClubUpgrades').textContent = walkingClubUpgrades;
+  document.getElementById('neighborhoodWatchUpgrades').textContent = neighborhoodWatchUpgrades;
+  document.getElementById('vps').textContent = calculateVPS().toFixed(1);
     }
 
     setInterval(() => {
@@ -150,7 +265,12 @@
     "Karen saw a trampoline 2 inches too tall... citation incoming.",
     "Linda tried to host a bake sale. No permit.",
     "Doug parked facing the wrong way again.",
-    "Someone used a teal mailbox. HOA horror!"
+    "Someone used a teal mailbox. HOA horror!",
+    "Tina planted tulips 3 inches too close to the sidewalk.",
+    "Barb's garden gnome was facing east. It's always west-facing, HOA code 7.2.",
+    "Jeff installed a motion light that flashes Morse code at 3 a.m.",
+    "Janelle’s cat was spotted on a leash. Leash must be 6ft, not 7.",
+    "Steve forgot to edge his lawn—again."
   ];
   const gossipLog = document.getElementById("gossipLog");
   if (Math.random() < 0.2) {
@@ -168,9 +288,118 @@ function updateLeaderboard() {
   const leaderboard = document.getElementById("leaderboard");
   leaderboard.innerHTML = `
     <li>Karen — ${Math.floor(vp)} VP</li>
-    <li>Linda — ${Math.floor(vp * 0.72)} VP</li>
-    <li>Doug — ${Math.floor(vp * 0.53)} VP</li>
+    <li>Linda — ${Math.floor(vp * 0.89)} VP</li>
+    <li>Doug — ${Math.floor(vp * 0.76)} VP</li>
+    <li>Barb — ${Math.floor(vp * 0.65)} VP</li>
+    <li>Tina — ${Math.floor(vp * 0.61)} VP</li>
+    <li>Steve — ${Math.floor(vp * 0.58)} VP</li>
+    <li>Janelle — ${Math.floor(vp * 0.55)} VP</li>
+    <li>Jeff — ${Math.floor(vp * 0.53)} VP</li>
+    <li>Ron — ${Math.floor(vp * 0.51)} VP</li>
+    <li>Melinda — ${Math.floor(vp * 0.49)} VP</li>
+    <li>Greg — ${Math.floor(vp * 0.47)} VP</li>
   `;
+}
+function buyBirdFeederViolation() {
+  if (vp >= 25) {
+    vp -= 25;
+    birdFeederUpgrades++;
+    updateDisplay();
+  }
+}
+
+function buyGrassHeightViolation() {
+  if (vp >= 200) {
+    vp -= 200;
+    grassHeightUpgrades++;
+    updateDisplay();
+  }
+}
+
+function buyHolidayLightsViolation() {
+  if (vp >= 500) {
+    vp -= 500;
+    holidayLightsUpgrades++;
+    updateDisplay();
+  }
+}
+
+function buyDogPatrolUpgrade() {
+  if (vp >= 1000) {
+    vp -= 1000;
+    dogPatrolUpgrades++;
+    updateDisplay();
+  }
+}
+
+function buyWalkingClubUpgrade() {
+  if (vp >= 2500) {
+    vp -= 2500;
+    walkingClubUpgrades++;
+    updateDisplay();
+  }
+}
+
+function buyNeighborhoodWatchUpgrade() {
+  if (vp >= 5000) {
+    vp -= 5000;
+    neighborhoodWatchUpgrades++;
+    updateDisplay();
+  }
+}
+function convertToGossip() {
+  if (vp >= 100) {
+    vp -= 100;
+    gossipPoints++;
+    updateDisplay();
+  }
+}
+function triggerGossipEvent(tier) {
+  const costs = {1: 5, 2: 15, 3: 40};
+  const messages = {
+    1: "🗞️ Gossip spreads: Someone was seen mowing in pajama pants.",
+    2: "📣 Neighborhood erupts: Anonymous complaints spike!",
+    3: "🚨 Full-scale HOA inquiry launched. Fines incoming!"
+  };
+  const armorSlots = ["helmet", "chest", "legs", "arms", "feet", "gloves", "earrings", "watch"];
+
+  if (gossipPoints >= costs[tier]) {
+    gossipPoints -= costs[tier];
+    showPopup(messages[tier]);
+    if (tier === 1) {
+      vp += 100;
+      const slot = armorSlots[Math.floor(Math.random() * 8)];
+      const roll = Math.random();
+      if (roll < 0.1) armorTiers[slot] = Math.max(armorTiers[slot], 3);
+      else if (roll < 0.4) armorTiers[slot] = Math.max(armorTiers[slot], 2);
+      else armorTiers[slot] = Math.max(armorTiers[slot], 1);
+      armor[slot]++;
+    }
+    if (tier === 2) {
+      vp += 500;
+      const slot = armorSlots[Math.floor(Math.random() * 8)];
+      const roll = Math.random();
+      if (roll < 0.1) armorTiers[slot] = Math.max(armorTiers[slot], 3);
+      else if (roll < 0.4) armorTiers[slot] = Math.max(armorTiers[slot], 2);
+      else armorTiers[slot] = Math.max(armorTiers[slot], 1);
+      armor[slot]++;
+    }
+    if (tier === 3) {
+      vp += 1500;
+      const slot = armorSlots[Math.floor(Math.random() * 8)];
+      const roll = Math.random();
+      if (roll < 0.1) armorTiers[slot] = Math.max(armorTiers[slot], 3);
+      else if (roll < 0.4) armorTiers[slot] = Math.max(armorTiers[slot], 2);
+      else armorTiers[slot] = Math.max(armorTiers[slot], 1);
+      armor[slot]++;
+    }
+    updateDisplay();
+    updateDisplay();
+  } else {
+    showPopup("Not enough Gossip Points!");
+  }
+}
+
 }
 </script>
 <div id="popup"></div>
@@ -197,6 +426,63 @@ setInterval(() => {
     showPopup(message);
   }
 }, 5000);
+</script>
+<div class="panel" id="armorPanel" style="display: none;">
+  <h3>🛡️ Karen's HOA Armor Set</h3>
+  <ul style="list-style: none; padding-left: 0; font-size: 14px;">
+    <li>Helmet: <span id="armor-helmet">0</span></li>
+    <li>Chest: <span id="armor-chest">0</span></li>
+    <li>Legs: <span id="armor-legs">0</span></li>
+    <li>Arms: <span id="armor-arms">0</span></li>
+    <li>Feet: <span id="armor-feet">0</span></li>
+    <li>Gloves: <span id="armor-gloves">0</span></li>
+    <li>Earrings: <span id="armor-earrings">0</span></li>
+    <li>Watch: <span id="armor-watch">0</span></li>
+  </ul>
+</div>
+<button onclick="toggleArmorPanel()">🧥 Toggle Armor Panel</button>
+
+<script>
+function toggleArmorPanel() {
+  const panel = document.getElementById("armorPanel");
+  panel.style.display = panel.style.display === "none" ? "block" : "none";
+}
+
+let armorSetBonusAwarded = { tier1: false, tier2: false, tier3: false };
+
+function updateArmorDisplay() {
+  Object.keys(armor).forEach(part => {
+    const tier = armorTiers[part];
+    const label = tier === 3 ? "(💎)" : tier === 2 ? "(✨)" : tier === 1 ? "(*)" : "";
+    document.getElementById(`armor-${part}`).textContent = armor[part] + " " + label;
+  });
+
+  // Apply set bonus
+  const tierSetCounts = [0, 0, 0];
+  Object.keys(armor).forEach(part => {
+    const tier = armorTiers[part];
+    if (tier === 1) tierSetCounts[0]++;
+    else if (tier === 2) tierSetCounts[1]++;
+    else if (tier === 3) tierSetCounts[2]++;
+  });
+
+  if (tierSetCounts[0] === 8 && !armorSetBonusAwarded.tier1) {
+    vp += 200;
+    armorSetBonusAwarded.tier1 = true;
+    showPopup("(*) Full Tier 1 Karen Armor Set Bonus! +200 VP!");
+  }
+  if (tierSetCounts[1] === 8 && !armorSetBonusAwarded.tier2) {
+    vp += 500;
+    armorSetBonusAwarded.tier2 = true;
+    showPopup("✨ Full Tier 2 Karen Armor Set Bonus! +500 VP!");
+  }
+  if (tierSetCounts[2] === 8 && !armorSetBonusAwarded.tier3) {
+    vp += 1000;
+    armorSetBonusAwarded.tier3 = true;
+    showPopup("💎 Full Tier 3 Karen Armor Set Bonus! +1000 VP!");
+  }
+  }
+}
 </script>
 </body>
 </html>
