@@ -38,7 +38,19 @@
     #stats {
       font-weight: bold;
     }
-  </style>
+  .flame-shake {
+      animation: shake 0.5s infinite alternate;
+    }
+
+    @keyframes shake {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(2px, -2px); }
+    }
+  .flame-glow {
+    box-shadow: 0 0 10px 2px #ff4500, 0 0 20px 6px #ff6347;
+    transition: box-shadow 0.3s ease-in-out;
+  }
+</style>
 <style>
   #popup {
     position: fixed;
@@ -59,20 +71,19 @@
 <body>
   <h1>Karen's HOA Empire</h1>
 
-  $1
+  <div class="panel" id="stats">
+  <p>Violation Points: <span id="vp">0</span></p>
     <p>Armor Points: <span id="armor">0</span></p>
-    <button onclick="buyArmor()">🛡️ Buy HOA Legal Armor (750 VP)</button>
-
+    
   <div class="panel">
     <h3>Violations</h3>
-    <button onclick="buyTrashCanViolation()">🗑️ Trash Can Patrol (10 VP)</button><br>
     <button onclick="buyBirdFeederViolation()">🐦 Illegal Bird Feeder (25 VP)</button><br>
     <button onclick="buyGrassHeightViolation()">🌾 Improper Grass Height (200 VP)</button><br>
     <button onclick="buyHolidayLightsViolation()">🎄 Holiday Lights Off-Season (500 VP)</button><br>
   </div>
 
-  <div class="panel">
-    <h3>Neighborhood Upgrades</h3>
+  
+    <button onclick="buyNeighborhoodWatchSpeedUpgrade()">⏱️ Upgrade Watch Speed (10,000 VP)</button><br>
     <button onclick="buyDogPatrolUpgrade()">🐕 Dog Poop Patrol (1000 VP)</button><br>
     <button onclick="buyWalkingClubUpgrade()">🚶 Walking Club (2500 VP)</button><br>
     <button onclick="buyNeighborhoodWatchUpgrade()">👀 Neighborhood Watch (5000 VP)</button><br>
@@ -94,12 +105,20 @@
       });
 
       function renderCuldesac() {
+        const autoDetectChance = neighborhoodWatchUpgrades * 0.05;
         const container = document.getElementById("culdesac");
         container.innerHTML = "";
         houses.forEach(name => {
           const div = document.createElement("div");
           div.className = "house-tile";
           div.textContent = name + (houseStatus[name].gossipTarget ? " 🔥" : "");
+          if (houseStatus[name].gossipTarget) {
+            div.classList.add("flame-shake");
+            div.classList.add("flame-glow");
+          } else {
+            div.classList.remove("flame-shake");
+            div.classList.remove("flame-glow");
+          }
           div.style.width = "80px";
           div.style.height = "80px";
           div.style.background = houseStatus[name].gossipTarget ? "#ffc0cb" : "#ddd";
@@ -108,8 +127,20 @@
           div.style.padding = "5px";
           div.style.cursor = "pointer";
           div.onclick = () => {
-            houseStatus[name].violations++;
-            influence[name]++;
+            if (houseStatus[name].gossipTarget) {
+              vp += 5;
+              if (Math.random() < autoDetectChance) {
+                // manually resolved
+              houseStatus[name].gossipTarget = false;
+                showPopup(`${name} automatically resolved by Neighborhood Watch! +5 VP!`);
+              } else {
+              // keep
+              showPopup(`${name} cited! +5 VP!`);
+              houseStatus[name].gossipTarget = false;
+            } else {
+              influence[name]++;
+              showPopup(`${name} inspected. Influence: ${influence[name]}`);
+            }
             showPopup(`${name} checked. Violations: ${houseStatus[name].violations}, Influence: ${influence[name]}`);
             updateDisplay();
             renderCuldesac();
@@ -128,7 +159,19 @@
         renderCuldesac();
       }
 
-      setInterval(highlightGossipTargets, 15000);
+      setInterval(() => {
+        highlightGossipTargets();
+        if (neighborhoodWatchUpgrades > 0) {
+          Object.keys(houseStatus).forEach(name => {
+            if (houseStatus[name].gossipTarget && Math.random() < neighborhoodWatchUpgrades * 0.05 * neighborhoodWatchSpeed) {
+              houseStatus[name].gossipTarget = false;
+              vp += 5;
+              showPopup(`${name} auto-handled by Watch! +5 VP`);
+            }
+          });
+          renderCuldesac();
+        }
+      }, 15000);
       renderCuldesac();
     </script>
     <div style="width: 80px; height: 80px; background: #ddd; border: 2px solid #999; border-radius: 10px; padding: 5px;">Karen</div>
@@ -152,7 +195,7 @@
     <button onclick="triggerGossipEvent(3)">Launch Full HOA Inquiry (40 GP)</button>
   </div>
 
-$1
+
     <p>Gossip Points: <span id="gossipPoints">0</span></p>
 <p>Influence Points: <span id="influencePoints">0</span></p>
     <button onclick="convertToGossip()">Transfer 100 VP ➡️ 1 Gossip Point</button>
@@ -212,6 +255,7 @@ let holidayLightsUpgrades = 0;
 let dogPatrolUpgrades = 0;
 let walkingClubUpgrades = 0;
 let neighborhoodWatchUpgrades = 0;
+let neighborhoodWatchSpeed = 1;
         
     function issueViolation() {
       vp++;
@@ -245,7 +289,7 @@ let neighborhoodWatchUpgrades = 0;
   document.getElementById('influencePoints').textContent = influencePoints;
   updateGossip();
   updateLeaderboard();
-  document.getElementById('vp').textContent = Math.floor(vp);
+  if (document.getElementById('vp')) document.getElementById('vp').textContent = Math.floor(vp);
   document.getElementById('trashUpgrades').textContent = trashUpgrades;
   document.getElementById('birdFeederUpgrades').textContent = birdFeederUpgrades;
   document.getElementById('grassHeightUpgrades').textContent = grassHeightUpgrades;
@@ -347,6 +391,15 @@ function buyNeighborhoodWatchUpgrade() {
     updateDisplay();
   }
 }
+
+function buyNeighborhoodWatchSpeedUpgrade() {
+  if (vp >= 10000) {
+    vp -= 10000;
+    neighborhoodWatchSpeed += 1;
+    updateDisplay();
+  }
+}
+}
 function convertToGossip() {
   if (vp >= 100) {
     vp -= 100;
@@ -398,8 +451,6 @@ function triggerGossipEvent(tier) {
   } else {
     showPopup("Not enough Gossip Points!");
   }
-}
-
 }
 </script>
 <div id="popup"></div>
@@ -481,7 +532,7 @@ function updateArmorDisplay() {
     armorSetBonusAwarded.tier3 = true;
     showPopup("💎 Full Tier 3 Karen Armor Set Bonus! +1000 VP!");
   }
-  }
+}
 }
 </script>
 </body>
